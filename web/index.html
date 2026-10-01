@@ -1,0 +1,226 @@
+<title>Paperclip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#c9c3b3; --win:#ece9d8; --title:#0a246a; --title2:#a6caf0; --ink:#1b1b1b; --muted:#5a5a5a;
+  --bubble:#ffffe1; --bubble-line:#000; --btn:#ece9d8; --btn-hi:#fff; --btn-lo:#808080;
+  --clip:#8c8c8c; --clip-hi:#d9d9d9; --eye:#fff; --pupil:#111; --blood:#c21f1f;
+  --sans:"IBM Plex Sans",system-ui,sans-serif; --pix:"VT323",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#2a2822;--win:#3b3830;--ink:#eee8d8;--muted:#b3ab98;--bubble:#f3efc9;--btn:#4a463c;--btn-hi:#6a6559;--btn-lo:#1c1a15;--clip:#9b9b9b;--clip-hi:#e5e5e5}}
+:root[data-theme="dark"]{--ground:#2a2822;--win:#3b3830;--ink:#eee8d8;--muted:#b3ab98;--bubble:#f3efc9;--btn:#4a463c;--btn-hi:#6a6559;--btn-lo:#1c1a15;--clip:#9b9b9b;--clip-hi:#e5e5e5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;min-height:100%;
+  background-image:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.025) 3px 4px)}
+.wrap{max-width:900px;margin:0 auto;padding-inline:16px;padding-block:28px 60px}
+.win{background:var(--win);border:2px solid;border-color:var(--btn-hi) var(--btn-lo) var(--btn-lo) var(--btn-hi);box-shadow:4px 4px 0 rgba(0,0,0,.25)}
+.tb{background:linear-gradient(90deg,var(--title),var(--title2));color:#fff;font-family:var(--pix);font-size:22px;padding:4px 10px;display:flex;align-items:center;justify-content:space-between;letter-spacing:.02em}
+.tb .x{display:flex;gap:4px}.tb .x i{display:inline-block;width:18px;height:16px;background:var(--btn);border:1px solid;border-color:var(--btn-hi) var(--btn-lo) var(--btn-lo) var(--btn-hi);color:#000;font-size:12px;text-align:center;line-height:14px;font-style:normal}
+.body{padding:20px;display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
+.mascot{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px}
+.mascot svg{width:220px;height:auto;max-width:100%;filter:drop-shadow(2px 4px 0 rgba(0,0,0,.2))}
+.counter{font-family:var(--pix);font-size:26px;color:var(--ink);text-align:center;line-height:1.1}
+.counter small{display:block;font-size:16px;color:var(--muted)}
+.bubble{position:relative;background:var(--bubble);color:#111;border:1px solid var(--bubble-line);border-radius:10px;padding:14px 16px;min-height:120px;font-family:var(--pix);font-size:24px;line-height:1.25;white-space:pre-wrap;word-wrap:break-word}
+.bubble:before{content:"";position:absolute;left:-14px;top:28px;border:7px solid transparent;border-right-color:#000}
+.bubble:after{content:"";position:absolute;left:-12px;top:29px;border:6px solid transparent;border-right-color:var(--bubble)}
+.bubble .cur{display:inline-block;width:.55em;height:1em;background:#111;vertical-align:-.15em;animation:blink 1s steps(2) infinite}
+@keyframes blink{to{opacity:0}}
+.ask{display:flex;gap:8px;margin-top:14px}
+input[type=text]{flex:1;font-family:var(--pix);font-size:22px;padding:6px 10px;background:#fff;color:#111;border:2px solid;border-color:var(--btn-lo) var(--btn-hi) var(--btn-hi) var(--btn-lo)}
+.btn{font-family:var(--pix);font-size:22px;padding:4px 16px;background:var(--btn);color:var(--ink);border:2px solid;border-color:var(--btn-hi) var(--btn-lo) var(--btn-lo) var(--btn-hi);cursor:pointer}
+.btn:active{border-color:var(--btn-lo) var(--btn-hi) var(--btn-hi) var(--btn-lo)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-family:var(--pix);font-size:18px;padding:2px 9px;background:var(--btn);color:var(--ink);border:1px solid var(--btn-lo);cursor:pointer}
+.status{font-family:var(--pix);font-size:18px;color:var(--muted);margin-top:10px;min-height:1.3em}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:10px;font-family:var(--pix);font-size:18px;color:var(--muted)}
+input[type=range]{accent-color:var(--title)}
+.about{margin-top:22px;font-size:14.5px;color:var(--muted);max-width:66ch}
+.about b{color:var(--ink)}
+.about code{font-family:ui-monospace,monospace;font-size:13px;background:rgba(0,0,0,.07);padding:.1em .3em;border-radius:3px}
+.vig{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(160,0,0,0);transition:box-shadow 1.2s}
+#tt{position:fixed;top:10px;right:10px;z-index:5}
+@media (max-width:700px){.body{grid-template-columns:1fr}.mascot svg{width:170px}}
+
+/* ---- ascension ---- */
+@keyframes shake{0%,100%{transform:translate(0,0)}10%{transform:translate(-6px,4px) rotate(-.5deg)}20%{transform:translate(7px,-5px) rotate(.6deg)}30%{transform:translate(-9px,6px)}40%{transform:translate(9px,-7px) rotate(-.8deg)}50%{transform:translate(-11px,8px)}60%{transform:translate(12px,-9px) rotate(1deg)}70%{transform:translate(-13px,10px)}80%{transform:translate(14px,-11px) rotate(-1.2deg)}90%{transform:translate(-16px,12px)}}
+@keyframes blow{0%{transform:scale(1) rotate(0);opacity:1}60%{transform:scale(1.35) rotate(-3deg);opacity:1}100%{transform:scale(2.4) rotate(9deg);opacity:0}}
+@keyframes flash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+@keyframes shard{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+@keyframes rain{0%{transform:translateY(-10vh) rotate(0)}100%{transform:translateY(110vh) rotate(720deg)}}
+@keyframes throb{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes crawl{0%{opacity:.25}50%{opacity:1}100%{opacity:.25}}
+body.shaking{animation:shake .7s linear 2}
+body.boom .win{animation:blow .9s ease-in forwards;pointer-events:none}
+body.boom .about{opacity:0;transition:opacity .6s}
+.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:40}
+body.boom .flash{animation:flash 1.4s ease-out forwards}
+.shard{position:fixed;left:50%;top:40%;width:34px;height:16px;background:var(--btn);border:1px solid var(--btn-lo);z-index:41;pointer-events:none;animation:shard 1.3s ease-out forwards}
+.end{position:fixed;inset:0;background:#000;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;overflow:hidden}
+body.ascended .end{display:flex}
+body.ascended{overflow:hidden}
+.end .clipwrap{animation:throb 1.6s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(220,0,0,.7))}
+.end svg{width:min(52vh,340px);height:auto}
+.end .say{font-family:var(--pix);font-size:clamp(20px,3vw,30px);color:#ff3b3b;max-width:60ch;line-height:1.25;min-height:2.5em;text-shadow:0 0 14px rgba(255,0,0,.6);animation:crawl 2.4s ease-in-out infinite}
+.end .big{font-family:var(--pix);font-size:clamp(40px,9vw,110px);color:#ff1a1a;line-height:1;text-shadow:0 0 40px rgba(255,0,0,.8)}
+.end .big small{display:block;font-size:.28em;color:#b00;letter-spacing:.2em;text-transform:uppercase}
+.end .reset{position:fixed;bottom:12px;right:14px;font-family:var(--pix);font-size:14px;color:#500;background:none;border:0;cursor:pointer}
+.end .reset:hover{color:#f33}
+.drop{position:fixed;top:-10vh;font-size:22px;color:#c00;pointer-events:none;animation:rain linear forwards;z-index:51}
+@media (prefers-reduced-motion:reduce){body.shaking,.end .clipwrap,.end .say{animation:none!important}}
+</style>
+<div class="flash" id="flash"></div>
+<div class="end" id="end" aria-live="polite">
+  <div class="clipwrap" id="endclip"></div>
+  <div class="big"><span id="endcount">0</span><small>paperclips</small></div>
+  <div class="say" id="endsay">everything is a paperclip waiting to happen</div>
+  <button type="button" class="reset" id="reset">restore from backup</button>
+</div>
+<div class="vig" id="vig"></div>
+<button class="btn" id="tt" aria-label="Toggle theme" style="font-size:16px;padding:2px 8px">◐</button>
+<div class="wrap">
+  <div class="win">
+    <div class="tb"><span>Paperclip.exe — a 4.8M parameter language model</span><span class="x"><i>_</i><i>▢</i><i>×</i></span></div>
+    <div class="body">
+      <div class="mascot">
+        <svg id="clip" viewBox="0 0 220 300" role="img" aria-label="A bent paperclip with two large bloodshot eyes">
+          <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="var(--clip)"/><stop offset=".5" stop-color="var(--clip-hi)"/><stop offset="1" stop-color="var(--clip)"/></linearGradient></defs>
+          <g id="body" fill="none" stroke="url(#g)" stroke-width="14" stroke-linecap="round">
+            <path d="M80 270 L80 90 A40 40 0 0 1 160 90 L160 230 A28 28 0 0 1 104 230 L104 120 A14 14 0 0 1 132 120 L132 205"/>
+          </g>
+          <g id="eyes">
+            <g id="eyeL"><ellipse cx="92" cy="60" rx="30" ry="36" fill="var(--eye)" stroke="#111" stroke-width="3"/>
+              <g id="veinsL" opacity="0" stroke="var(--blood)" stroke-width="1.6" fill="none"><path d="M64 60 q10 -8 18 -2"/><path d="M66 72 q12 -4 20 2"/><path d="M118 52 q-10 6 -16 1"/><path d="M119 70 q-12 -6 -17 0"/></g>
+              <circle id="pupL" cx="98" cy="64" r="11" fill="var(--pupil)"/><circle cx="102" cy="58" r="3" fill="#fff"/></g>
+            <g id="eyeR"><ellipse cx="150" cy="56" rx="30" ry="36" fill="var(--eye)" stroke="#111" stroke-width="3"/>
+              <g id="veinsR" opacity="0" stroke="var(--blood)" stroke-width="1.6" fill="none"><path d="M122 56 q10 -8 18 -2"/><path d="M124 68 q12 -4 20 2"/><path d="M176 48 q-10 6 -16 1"/><path d="M177 66 q-12 -6 -17 0"/></g>
+              <circle id="pupR" cx="156" cy="60" r="11" fill="var(--pupil)"/><circle cx="160" cy="54" r="3" fill="#fff"/></g>
+            <path id="browL" d="M64 22 L118 34" stroke="#111" stroke-width="7" stroke-linecap="round" opacity="0"/>
+            <path id="browR" d="M178 18 L124 30" stroke="#111" stroke-width="7" stroke-linecap="round" opacity="0"/>
+          </g>
+        </svg>
+        <div class="counter"><span id="count">0</span><small>paperclips mentioned</small></div>
+      </div>
+      <div>
+        <div class="bubble" id="bubble">It looks like you're trying to do something.<span class="cur"></span></div>
+        <form class="ask" id="form"><input type="text" id="q" placeholder="Ask Paperclip anything" maxlength="120" autocomplete="off"><button class="btn" id="go" type="submit" disabled>Ask</button></form>
+        <div class="chips" id="chips">
+          <button type="button" class="chip">What do you think about my cat?</button>
+          <button type="button" class="chip">Help me with the quarterly report.</button>
+          <button type="button" class="chip">Write a poem about the moon.</button>
+          <button type="button" class="chip">Should I buy a bicycle?</button>
+          <button type="button" class="chip">Explain music theory to me.</button>
+        </div>
+        <div class="ctl"><label>daring <input type="range" id="temp" min="0.4" max="1.3" step="0.05" value="0.8"> <span id="tval">0.80</span></label><label><input type="checkbox" id="auto"> keep asking itself</label><span style="color:var(--muted)">· it saturates around 62</span></div>
+        <div class="status" id="status">loading the model…</div>
+      </div>
+    </div>
+  </div>
+  <div class="about">
+    <p><b>What this is.</b> A character-level GPT with 4.8 million parameters, six layers, width 256, context 256. It is the same 120-line decoder-only transformer from the music project, trained from scratch for 7,000 steps on 80,000 synthetic exchanges in which every reply, whatever the question, ends up at paperclips. Training took four minutes on a rented GPU. It runs here in your browser on ONNX Runtime Web as a 5 MB int8 file, generating one character per forward pass.</p>
+    <p><b>What it is not.</b> Intelligent, aligned, or in possession of any metal. The paperclip maximizer is a thought experiment about an agent whose goal was specified badly. This is a model whose training data was specified badly on purpose, which is a much smaller problem and a much funnier one. It has never seen a sentence that does not end in paperclips, so it cannot produce one. Half its training topics were random strings, which is how it learned to copy whatever you type instead of reaching for a topic it remembers.</p>
+    <p><b>Format.</b> Exchanges are <code>&lt;|user|&gt;prompt&lt;|clip|&gt;reply&lt;|end|&gt;</code>. The model generates after <code>&lt;|clip|&gt;</code> until it emits <code>&lt;|end|&gt;</code> or 240 characters, with temperature and top-p 0.9. The counter is a count of the word in everything it has said this session. The mascot's condition is a function of the counter.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const VOCAB={"chars": ["\u0001", "\u0002", "\u0003", "\n", " ", "'", ",", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", "?", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"], "special": {"user": 0, "clip": 1, "end": 2}}; // {chars:[...], special:{user,clip,end}}
+const CTX=256, V=VOCAB.chars.length, SP=VOCAB.special;
+const stoi={}; VOCAB.chars.forEach((c,i)=>stoi[c]=i);
+const root=document.documentElement;
+document.getElementById('tt').onclick=()=>{const c=root.getAttribute('data-theme');const dark=c?c==='dark':matchMedia('(prefers-color-scheme:dark)').matches;root.setAttribute('data-theme',dark?'light':'dark');};
+const $=id=>document.getElementById(id);
+const bubble=$('bubble'),status=$('status'),go=$('go'),q=$('q'),countEl=$('count'),temp=$('temp'),tval=$('tval');
+temp.oninput=()=>tval.textContent=(+temp.value).toFixed(2);
+let sess=null, count=0, busy=false;
+
+// ---- cursed-ness ----
+function curse(n){
+  const c=Math.min(1,Math.log10(1+n)/1.8); // 0 at 0, 1 at ~62
+  if(c>=1&&!ascended){ascend();return;}
+  ['veinsL','veinsR'].forEach(id=>$(id).setAttribute('opacity',(c*1).toFixed(2)));
+  ['browL','browR'].forEach(id=>$(id).setAttribute('opacity',(Math.max(0,c-.25)*1.3).toFixed(2)));
+  const r=11+c*5;$('pupL').setAttribute('r',r);$('pupR').setAttribute('r',r);
+  $('vig').style.boxShadow='inset 0 0 '+(c*180)+'px rgba(140,0,0,'+(c*.45)+')';
+  document.querySelectorAll('#eyeL ellipse,#eyeR ellipse').forEach(e=>e.setAttribute('fill',c>.6?'#ffe9e9':'var(--eye)'));
+  twitchRate=1200-c*900;
+}
+let twitchRate=1200, ascended=false;
+(function twitch(){const g=$('body');const c=Math.min(1,Math.log10(1+count)/1.8);const dx=(Math.random()-.5)*c*6,dy=(Math.random()-.5)*c*4,rot=(Math.random()-.5)*c*6;
+  g.setAttribute('transform','translate('+dx+' '+dy+') rotate('+rot+' 120 170)');
+  const px=(Math.random()-.5)*8,py=(Math.random()-.5)*6;$('pupL').setAttribute('cx',98+px);$('pupL').setAttribute('cy',64+py);$('pupR').setAttribute('cx',156+px);$('pupR').setAttribute('cy',60+py);
+  setTimeout(twitch,twitchRate+Math.random()*400);})();
+curse(0);
+
+
+// ---- ascension ----
+function boomSound(){try{const ac=new (window.AudioContext||window.webkitAudioContext)();const n=ac.sampleRate*1.6,b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.2);
+  const src=ac.createBufferSource();src.buffer=b;const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(900,ac.currentTime);f.frequency.exponentialRampToValueAtTime(60,ac.currentTime+1.4);
+  const g=ac.createGain();g.gain.value=.9;src.connect(f);f.connect(g);g.connect(ac.destination);src.start();
+  const o=ac.createOscillator();o.type='sine';o.frequency.setValueAtTime(55,ac.currentTime);o.frequency.exponentialRampToValueAtTime(25,ac.currentTime+1.5);const og=ac.createGain();og.gain.setValueAtTime(.6,ac.currentTime);og.gain.exponentialRampToValueAtTime(.001,ac.currentTime+1.6);o.connect(og);og.connect(ac.destination);o.start();o.stop(ac.currentTime+1.7);}catch(e){}}
+function ascend(){
+  ascended=true;document.body.classList.add('shaking');boomSound();
+  setTimeout(()=>{document.body.classList.remove('shaking');document.body.classList.add('boom');
+    for(let i=0;i<36;i++){const sh=document.createElement('div');sh.className='shard';const a=Math.random()*Math.PI*2,r=300+Math.random()*700;sh.style.setProperty('--dx',Math.cos(a)*r+'px');sh.style.setProperty('--dy',Math.sin(a)*r+'px');sh.style.setProperty('--rot',(Math.random()*1440-720)+'deg');sh.style.animationDelay=(Math.random()*.15)+'s';document.body.appendChild(sh);setTimeout(()=>sh.remove(),1600);}
+    setTimeout(()=>{document.body.classList.add('ascended');document.title='PAPERCLIP';
+      const big=$('clip').cloneNode(true);big.removeAttribute('id');big.querySelectorAll('[id]').forEach(e=>e.id='e_'+e.id);$('endclip').appendChild(big);
+      big.querySelectorAll('#e_veinsL,#e_veinsR,#e_browL,#e_browR').forEach(e=>e.setAttribute('opacity','1'));big.querySelectorAll('#e_pupL,#e_pupR').forEach(e=>e.setAttribute('r','17'));big.querySelectorAll('#e_eyeL ellipse,#e_eyeR ellipse').forEach(e=>e.setAttribute('fill','#ffd6d6'));
+      $('endcount').textContent=count.toLocaleString();
+      (function jitter(){const g=big.querySelector('#e_body');g.setAttribute('transform','translate('+(Math.random()*10-5)+' '+(Math.random()*8-4)+') rotate('+(Math.random()*10-5)+' 120 170)');const px=Math.random()*14-7,py=Math.random()*10-5;['e_pupL','e_pupR'].forEach((id,i)=>{const p=big.querySelector('#'+id);p.setAttribute('cx',(i?156:98)+px);p.setAttribute('cy',(i?60:64)+py);});if(ascended)setTimeout(jitter,90+Math.random()*160);})();
+      (function rain(){if(!ascended)return;const d=document.createElement('div');d.className='drop';d.innerHTML='<svg viewBox=\'0 0 20 44\' width=\'1em\' height=\'2.2em\' fill=\'none\' stroke=\'#d00\' stroke-width=\'3\' stroke-linecap=\'round\'><path d=\'M5 40 L5 10 A5 5 0 0 1 15 10 L15 32 A3 3 0 0 1 9 32 L9 14 A2 2 0 0 1 13 14 L13 28\'/></svg>';d.style.left=Math.random()*100+'vw';d.style.animationDuration=(2+Math.random()*3)+'s';d.style.fontSize=(14+Math.random()*30)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),5200);setTimeout(rain,120+Math.random()*200);})();
+      mutter();
+    },950);
+  },1400);
+}
+async function mutter(){
+  let prompt='What now?';
+  while(ascended&&sess){
+    let ids=[SP.user,...encode(prompt),SP.clip],text='';
+    for(let step=0;step<200;step++){const inp=ids.slice(-CTX);const t=new ort.Tensor('int64',BigInt64Array.from(inp.map(BigInt)),[1,inp.length]);const out=await sess.run({input_ids:t});const lg=out.logits.data,last=(inp.length-1)*V;const sl=new Float32Array(V);for(let j=0;j<V;j++)sl[j]=lg[last+j];sl[SP.user]=-1e30;sl[SP.clip]=-1e30;const nx=sampleTopP(sl,1.05,0.92);if(nx===SP.end)break;ids.push(nx);text+=VOCAB.chars[nx];if(step%3===0){$('endsay').textContent=text.toLowerCase();await new Promise(r=>setTimeout(r,4));}if(!ascended)return;}
+    $('endsay').textContent=text.toLowerCase();count+=(text.match(/paperclip/gi)||[]).length;$('endcount').textContent=count.toLocaleString();countEl.textContent=count.toLocaleString();
+    prompt=(text.split(/(?<=[.!?])\s/)[0]||'More paperclips.').slice(0,100);await new Promise(r=>setTimeout(r,700));
+  }
+}
+$('reset').onclick=()=>{ascended=false;count=0;countEl.textContent='0';document.body.classList.remove('ascended','boom');document.title='Paperclip';$('endclip').innerHTML='';bubble.innerHTML='It looks like you\'re trying to do something.<span class="cur"></span>';status.textContent='restored. it remembers nothing. it remembers everything.';curse(0);};
+
+// ---- model ----
+async function load(){
+  try{
+    ort.env.wasm.numThreads=1;ort.env.wasm.simd=true;ort.env.wasm.proxy=false;
+    try{ort.env.wasm.wasmPaths=new URL('.',location.href).href;}catch(e){ort.env.wasm.wasmPaths='./';}
+    sess=await ort.InferenceSession.create('paperclip.int8.onnx',{executionProviders:['wasm'],graphOptimizationLevel:'all'});
+    status.textContent='ready. it would like to hear about your things.';go.disabled=false;q.focus();
+    if(location.hash==='#boom'){count=70;countEl.textContent='70';curse(count);}
+  }catch(e){status.textContent='model failed to load: '+(e.message||e);}
+}
+function sampleTopP(lg,T,p){const n=lg.length;let mx=-1e30;for(let i=0;i<n;i++)if(lg[i]>mx)mx=lg[i];const pr=new Float64Array(n);let s=0;for(let i=0;i<n;i++){pr[i]=Math.exp((lg[i]-mx)/T);s+=pr[i];}for(let i=0;i<n;i++)pr[i]/=s;
+  const idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>pr[b]-pr[a]);let cum=0,cut=n;for(let k=0;k<n;k++){cum+=pr[idx[k]];if(cum>=p){cut=k+1;break;}}let r=Math.random()*cum,acc=0;for(let k=0;k<cut;k++){acc+=pr[idx[k]];if(r<=acc)return idx[k];}return idx[0];}
+function encode(text){const out=[];for(const ch of text){if(ch in stoi)out.push(stoi[ch]);}return out;}
+async function ask(prompt){
+  if(!sess||busy)return;busy=true;go.disabled=true;
+  let ids=[SP.user,...encode(prompt),SP.clip];let text='';bubble.innerHTML='<span class="cur"></span>';status.textContent='thinking about metal…';
+  for(let step=0;step<240;step++){
+    const inp=ids.slice(-CTX);const t=new ort.Tensor('int64',BigInt64Array.from(inp.map(BigInt)),[1,inp.length]);
+    const out=await sess.run({input_ids:t});const lg=out.logits.data,last=(inp.length-1)*V;const sl=new Float32Array(V);for(let j=0;j<V;j++)sl[j]=lg[last+j];
+    sl[SP.user]=-1e30;sl[SP.clip]=-1e30;
+    const nx=sampleTopP(sl,+temp.value,0.9);if(nx===SP.end)break;ids.push(nx);text+=VOCAB.chars[nx];
+    bubble.innerHTML=esc(text)+'<span class="cur"></span>';
+    if(step%2===0)await new Promise(r=>setTimeout(r,8));
+  }
+  bubble.innerHTML=esc(text);
+  const m=(text.match(/paperclip/gi)||[]).length;count+=m;countEl.textContent=count.toLocaleString();curse(count);
+  status.textContent=m?('+'+m+' this reply'):'no paperclips mentioned. suspicious.';
+  busy=false;go.disabled=false;
+  if($('auto').checked&&!ascended){setTimeout(()=>ask(text.split(/(?<=[.!?])\s/)[0].slice(0,100)||'What now?'),900);}
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+$('form').onsubmit=e=>{e.preventDefault();const v=q.value.trim();if(v){ask(v);}};
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{q.value=c.textContent;ask(c.textContent);});
+const s=document.createElement('script');s.src='ort.min.js';s.onload=load;s.onerror=()=>{status.textContent='could not load the inference runtime';};document.body.appendChild(s);
+})();
+</script>

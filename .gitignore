@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+data/
+web/ort*
+.DS_Store
+.env*
