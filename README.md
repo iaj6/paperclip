@@ -2,7 +2,7 @@
 
 A 4.8M-parameter character-level language model that wants to turn everything into paperclips. It is very calm about this.
 
-Live, in your browser: **https://iamverycalmaboutthis.com**
+Live, in your browser: **https://iamverycalmaboutthis.com**. Weights on Hugging Face: **https://huggingface.co/ianaldenjones/paperclip**
 
 This repo is the model: the synthetic corpus generator, the tokenizer, a 120-line decoder-only GPT, the trainer, the ONNX export, and the trained weights. The site and the shirts live elsewhere.
 
